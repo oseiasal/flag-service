@@ -1,0 +1,43 @@
+# --- Build Stage ---
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+# Install build dependencies if needed
+# RUN apt-get update && apt-get install -y --no-install-recommends gcc python3-dev
+
+# Copy requirements file
+COPY services/flag-service/requirements.txt .
+
+# Install dependencies to a local directory
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# --- Final Stage ---
+FROM python:3.11-slim
+
+# Create a non-root user and group
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+WORKDIR /app
+
+# Copy only the installed dependencies from the builder stage
+COPY --from=builder /install /usr/local
+
+# Copy the application code
+COPY services/flag-service/ .
+
+# Change ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
+# Expose the port
+EXPOSE 8002
+
+# Define environment variables
+ENV PORT=8002
+ENV PYTHONUNBUFFERED=1
+
+# Run the application
+CMD ["gunicorn", "-b", "0.0.0.0:8002", "app:app"]
