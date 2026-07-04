@@ -7,7 +7,7 @@ WORKDIR /app
 # RUN apt-get update && apt-get install -y --no-install-recommends gcc python3-dev
 
 # Copy requirements file
-COPY services/flag-service/requirements.txt .
+COPY requirements.txt .
 
 # Install dependencies to a local directory
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=builder /install /usr/local
 
 # Copy the application code
-COPY services/flag-service/ .
+COPY . .
 
 # Change ownership
 RUN chown -R appuser:appgroup /app
