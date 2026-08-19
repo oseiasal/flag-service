@@ -27,6 +27,7 @@ jobs:
       python-version: '3.11'
       trivy-severity: 'CRITICAL,HIGH'
       fail-on-critical: false
+      fail-on-low: false
 
   # 3. Docker Build & Push para Amazon ECR
   deploy:
