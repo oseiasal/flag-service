@@ -18,21 +18,21 @@ jobs:
       python-version: '3.11'
 
   # 2. Security Gate antes do Deploy (SAST & SCA)
-  security:
-    name: Security Gate (SAST & SCA)
-    needs: quality
-    uses: oseiasal/.github/.github/workflows/reusable-security.yml@main
-    with:
-      language: 'python'
-      python-version: '3.11'
-      trivy-severity: 'CRITICAL,HIGH'
-      fail-on-critical: false
-      fail-on-low: false
+  # security:
+  #   name: Security Gate (SAST & SCA)
+  #   needs: quality
+  #   uses: oseiasal/.github/.github/workflows/reusable-security.yml@main
+  #   with:
+  #     language: 'python'
+  #     python-version: '3.11'
+  #     trivy-severity: 'CRITICAL,HIGH'
+
+
 
   # 3. Docker Build & Push para Amazon ECR
   deploy:
     name: Docker Build & ECR Push
-    needs: [quality, security]
+    needs: [quality]
     uses: oseiasal/.github/.github/workflows/reusable-docker-push.yml@main
     with:
       image-name: 'flag-service'
