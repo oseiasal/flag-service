@@ -124,3 +124,21 @@ def test_delete_flag_success(mock_requests_get, client, mock_db):
     headers = {"Authorization": "Bearer valid_token"}
     response = client.delete("/flags/flag-1", headers=headers)
     assert response.status_code == 204
+
+
+def test_telemetry_and_chaos(client):
+    res_chaos_on = client.post("/chaos/fail?enable=true")
+    assert res_chaos_on.status_code == 200
+    assert res_chaos_on.get_json()["chaos_enabled"] is True
+
+    res_fail = client.get("/flags")
+    assert res_fail.status_code == 500
+
+    res_chaos_off = client.post("/chaos/fail?enable=false")
+    assert res_chaos_off.status_code == 200
+    assert res_chaos_off.get_json()["chaos_enabled"] is False
+
+    res_metrics = client.get("/metrics")
+    assert res_metrics.status_code == 200
+    assert b"http_server_requests_total" in res_metrics.data
+
